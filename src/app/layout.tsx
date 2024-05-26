@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
+import Layout from '@/app/LayoutBuilder';
 
-import NavBar from '@/components/navbar/Navbar';
-import ThemeProvider from '@/components/theme/ThemeProvider';
 import { cn } from '@/lib/utils';
 
 import '@/styles/globals.css';
@@ -25,12 +24,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
-        <section className='max-w-screen-xl p-5 mx-auto'>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
-            <NavBar />
-            {children}
-          </ThemeProvider>
-        </section>
+        <Layout>{children}</Layout>
       </body>
     </html>
   );
