@@ -1,5 +1,9 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import userTodo from '../../public/userTodo.png';
+
+import { ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   return (
@@ -8,6 +12,12 @@ export default function Home() {
         <h1 className='text-3xl md:text-6xl font-bold mt-7 mb-3'>Task-it</h1>
         <h3 className='text-xl md:text-2xl font-bold mb-5'> Your Tasks, Simplified.</h3>
         <p className='text-xl'>Productivity app to manage your task effortlessly</p>
+        <Link href={'/login'}>
+          <Button className=' mt-4 mb-2'>
+            <span className='mr-1'>Create Your First Task</span>
+            <ChevronRight />
+          </Button>
+        </Link>
         <div className='flex justify-center items-center'>
           <Image src={userTodo} alt='User clearing todo' width={600} height={400} placeholder='blur' />
         </div>
