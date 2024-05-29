@@ -4,8 +4,19 @@ import userTodo from '../../public/userTodo.png';
 
 import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
 
-export default function Home() {
+export default async function Home() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    return redirect('/todos');
+  }
+
   return (
     <main className='flex flex-col items-center justify-between min-h-[80vh] py-2'>
       <div className='text-center'>

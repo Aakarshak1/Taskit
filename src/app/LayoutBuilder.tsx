@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import NavBar from '@/components/navbar/Navbar';
 import ThemeProvider from '@/components/theme/ThemeProvider';
+import { Toaster } from '@/components/ui/sonner';
 
 const Pathname = ({
   children,
@@ -12,11 +13,17 @@ const Pathname = ({
   const pathname = usePathname();
   return (
     <div>
-      {pathname === '/login' || pathname === '/todos' ? (
-        <section className='max-w-screen-xl p-5 mx-auto'>
+      {pathname === '/login' || pathname === '/todos' || pathname === '/' ? (
+        <section className='max-w-screen-md p-5 mx-auto'>
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
             <NavBar />
             {children}
+            <Toaster
+              richColors
+              toastOptions={{
+                duration: 2500,
+              }}
+            />
           </ThemeProvider>
         </section>
       ) : (
