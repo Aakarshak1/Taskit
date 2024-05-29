@@ -1,8 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 
-const supabase = createClient();
-
 export async function getData(search: string, offset: number) {
+  const supabase = createClient();
   if (search) {
     // Partial search implement
     const { data, error } = await await supabase.rpc('search_todos', { prefix: `'${search}'` }).limit(10);
