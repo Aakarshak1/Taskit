@@ -13,22 +13,18 @@ const Pathname = ({
   const pathname = usePathname();
   return (
     <div>
-      {pathname === '/login' || pathname === '/todos' || pathname === '/' ? (
-        <section className='max-w-screen-md p-5 mx-auto'>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
-            <NavBar />
-            {children}
-            <Toaster
-              richColors
-              toastOptions={{
-                duration: 2500,
-              }}
-            />
-          </ThemeProvider>
-        </section>
-      ) : (
-        children
-      )}
+      <section className='max-w-screen-md p-5 mx-auto'>
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+          <NavBar />
+          {children}
+          <Toaster
+            richColors
+            toastOptions={{
+              duration: 2500,
+            }}
+          />
+        </ThemeProvider>
+      </section>
     </div>
   );
 };
