@@ -1,43 +1,19 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { revalidatePath } from 'next/cache';
 import { Database } from '@/utils/schema.types';
-import { TODO_STATUSES, LISTS } from '@/utils/constant';
+import { TODO_STATUSES, LISTS, formSchema } from '@/utils/constant';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-const supabase = createClient();
-
-const formSchema = z.object({
-  title: z.string().min(1, {
-    message: 'Title is required.',
-  }),
-  description: z.string().min(1, {
-    message: 'Description is required.',
-  }),
-  status: z.string({
-    required_error: 'please select status.',
-  }),
-  list: z.string().optional(),
-});
+import { createTodo, updateTodo } from '@/lib/db';
+import { toast } from 'sonner';
 
 type Todos = Database['public']['Tables']['todos']['Row'];
 
@@ -49,26 +25,37 @@ type TodoDialogProps = {
 export default function TodoFormDialog({ formType, todo }: TodoDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  // const supabase = useSupabaseClient<Database>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      status: 'in',
-      list: '0',
+      title: todo?.title ?? '',
+      description: todo?.description ?? '',
+      status: todo?.status ?? 'inprogress',
+      list: todo?.list ?? 'personal',
     },
   });
 
-  // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // ✅ This will be type-safe and validated.
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const _todo = {
+      ...values,
+      id: todo?.id,
+      is_complete: todo?.is_complete,
+      user_id: todo?.user_id,
+      inserted_at: todo?.inserted_at,
+    };
 
-    const { error } = await supabase.from('todos').insert({ ...values, is_complete: false, user_id: user?.id });
+    const { data, error } = formType === 'edit' ? await updateTodo(_todo) : await createTodo(values);
+
+    if (error) {
+      toast.error(`Unable to ${formType === 'edit' ? 'update' : 'create'} todo`, {
+        position: 'top-right',
+      });
+    }
+
+    toast.success(`Todo ${formType === 'edit' ? 'updated' : 'created'} successfully`, {
+      position: 'top-right',
+    });
 
     form.reset();
     setOpen(false);
@@ -84,7 +71,7 @@ export default function TodoFormDialog({ formType, todo }: TodoDialogProps) {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant='outline'>
+        <Button variant='outline' size='sm'>
           {formType === 'edit' && 'Edit todo'}
           {formType === 'create' && 'Create todo'}
         </Button>
