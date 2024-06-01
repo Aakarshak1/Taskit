@@ -26,12 +26,16 @@ const LoginForm = () => {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword(values);
     if (error) {
-      router.push('/');
+      router.refresh();
+      router.replace('/');
       toast.error(error?.message ?? 'Unable to Login', {
         position: 'top-right',
       });
+      return;
     }
-    router.push('/');
+
+    router.refresh();
+    window.location.replace('/todos');
   };
 
   return (

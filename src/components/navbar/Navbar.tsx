@@ -1,13 +1,18 @@
-'use client';
-
 import Link from 'next/link';
-import { Github, Moon, Sun, User } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Github } from 'lucide-react';
 
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from '@/components/ui/menubar';
+import { Menubar, MenubarMenu, MenubarTrigger } from '@/components/ui/menubar';
+import { createClient } from '@/utils/supabase/server';
+import ThemeToggle from '@/components/theme/ThemeToggle';
+import UserModal from './UserModal';
 
-const NavBar = () => {
-  const { setTheme } = useTheme();
+const NavBar = async () => {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <Menubar className='flex justify-between'>
       <div className='flex'>
@@ -24,12 +29,6 @@ const NavBar = () => {
       </div>
       <div className='flex items-center'>
         <MenubarMenu>
-          {/* <MenubarMenu>
-            <MenubarTrigger className='cursor-pointer'>
-              <User />
-            </MenubarTrigger>
-          </MenubarMenu> */}
-
           <MenubarMenu>
             <MenubarTrigger className='cursor-pointer'>
               <a href='https://github.com/Aakarshak1/Taskit' target='_blank'>
@@ -37,25 +36,8 @@ const NavBar = () => {
               </a>
             </MenubarTrigger>
           </MenubarMenu>
-
-          <MenubarMenu>
-            <MenubarTrigger className='cursor-pointer'>
-              <Sun className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
-              <Moon className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
-              <span className='sr-only'>Toggle theme button</span>
-            </MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem className='cursor-pointer' onClick={() => setTheme('light')}>
-                Light
-              </MenubarItem>
-              <MenubarItem className='cursor-pointer' onClick={() => setTheme('dark')}>
-                Dark
-              </MenubarItem>
-              <MenubarItem className='cursor-pointer' onClick={() => setTheme('system')}>
-                System
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+          {user ? <UserModal user={user} /> : null}
+          <ThemeToggle />
         </MenubarMenu>
       </div>
     </Menubar>
