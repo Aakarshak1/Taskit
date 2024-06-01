@@ -3,12 +3,22 @@ import TodoFormDialog from './TodoDialog';
 import { getData } from '@/lib/db';
 import { Search, SortFilter } from './Search';
 import TodosDataTable from './TodoTable';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 const Todos = async ({ searchParams }: { searchParams: { q: string; offset: string } }) => {
   const search = searchParams.q ?? '';
-  console.log(search);
   const offset = searchParams.offset ?? 0;
   const data = await getData(search, Number(offset));
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect('/');
+  }
 
   return (
     <main className='flex flex-1 flex-col p-4 md:p-6'>

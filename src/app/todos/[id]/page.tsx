@@ -3,15 +3,26 @@ import TodoDialog from '../TodoDialog';
 import { getDataByID } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import DeleteButton from './DeleteButton';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 type SingleTodoProps = {
   params: { id: string };
 };
 
 const SingleTodo = async ({ params }: SingleTodoProps) => {
+  const supabase = createClient();
   const data = await getDataByID(Number(params.id));
   if (!data || data?.length <= 0) {
     notFound();
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect('/');
   }
 
   const todo = data?.[0];
