@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -28,11 +28,13 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { deleteTodo } from '@/lib/db';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type TodoType = Database['public']['Tables']['todos']['Row'];
 
 export default function TodosDataTable({ data }: { data: TodoType[] }) {
+  const searchParams = useSearchParams();
+  const search = searchParams.get('q');
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -173,37 +175,13 @@ export default function TodosDataTable({ data }: { data: TodoType[] }) {
     },
   });
 
+  useEffect(() => {
+    table.getColumn('title')?.setFilterValue(search);
+  }, [search, table]);
+
   return (
     <>
-      {/* <TodoDialog formType='edit' todo={rowData} /> */}
       <div className='w-full'>
-        {/* {editTodo ? <TodoDialog formType='edit' todo={rowData} /> : null} */}
-        {/* <div className=' flex items-center py-4'>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='outline' className='ml-auto'>
-              Sort by <ChevronDownIcon className='ml-2 h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className='capitalize'
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div> */}
         <div className='rounded-md border'>
           <Table>
             <TableHeader>

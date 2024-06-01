@@ -2,18 +2,8 @@
 
 import { useTransition, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SearchIcon, ChevronDownIcon } from 'lucide-react';
-
+import { SearchIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-
-import { TODO_STATUSES } from '@/utils/constant';
 
 function Spinner() {
   return (
@@ -68,29 +58,10 @@ export function Search(props: { value?: string }) {
           setValue(e.currentTarget.value);
         }}
         spellCheck={false}
-        className='w-full bg-white shadow-none appearance-none pl-8'
+        className='w-full shadow-none appearance-none pl-8'
         placeholder='Search title...'
       />
       {isPending && <Spinner />}
-    </div>
-  );
-}
-
-export function SortFilter() {
-  return (
-    <div className=''>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant='outline' className='ml-auto'>
-            Sort by <ChevronDownIcon className='ml-2 h-4 w-4' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end'>
-          <DropdownMenuCheckboxItem>{TODO_STATUSES.TODO}</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem>{TODO_STATUSES.INPROGRESS}</DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem>{TODO_STATUSES.DONE}</DropdownMenuCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 }
