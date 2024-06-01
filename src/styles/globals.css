@@ -74,10 +74,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-  input:focus-visible,
-  textarea:focus-visible {
-    @apply ring-offset-0 ring-0 !important;
-  }
-
-/* focus-visible:ring-0 focus-visible:ring-offset-0 */
