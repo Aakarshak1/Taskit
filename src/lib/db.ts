@@ -38,22 +38,12 @@ export async function deleteTodo(todoId: string | number) {
   return res;
 }
 
-export async function getData(search: string, offset: number) {
+export async function getData() {
   const supabase = createClient();
-  if (search) {
-    // Partial search implement
-    const { data, error } = await supabase.rpc('search_todos', { prefix: `'${search}'` }).limit(10);
-    console.log({ data, error });
-    return data;
-  }
 
-  const { data, error } = await supabase
-    .from('todos')
-    .select()
-    .order('inserted_at', {
-      ascending: false,
-    })
-    .limit(10);
+  const { data, error } = await supabase.from('todos').select().order('inserted_at', {
+    ascending: false,
+  });
 
   if (error) {
     // This will activate the closest `error.js` Error Boundary
