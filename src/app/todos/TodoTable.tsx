@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ArrowUpDown } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,22 +15,18 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ArrowUpDown, Ellipsis } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuLabel,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Database } from '@/utils/schema.types';
+
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { deleteTodo } from '@/lib/db';
-import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+
+import TodoActionMenu from './TodoActionMenu';
+
+import { Database } from '@/utils/schema.types';
+import { deleteTodo, updateTodoNewStatus } from '@/lib/db';
 
 type TodoType = Database['public']['Tables']['todos']['Row'];
 
@@ -40,8 +38,6 @@ export default function TodosDataTable({ data }: { data: TodoType[] }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [editTodo, setEditTodo] = useState<boolean>(false);
-  const [rowData, setRowData] = useState<TodoType>();
 
   const columns: ColumnDef<TodoType>[] = [
     {
@@ -71,9 +67,6 @@ export default function TodosDataTable({ data }: { data: TodoType[] }) {
         );
       },
       cell: ({ row }) => {
-        {
-          /* @ts-ignore */
-        }
         return <Badge variant={row.getValue('status')}>{row.getValue('status')}</Badge>;
       },
     },
@@ -88,9 +81,6 @@ export default function TodosDataTable({ data }: { data: TodoType[] }) {
         );
       },
       cell: ({ row }) => {
-        {
-          /* @ts-ignore */
-        }
         return <Badge variant={row.getValue('list')}>{row.getValue('list')}</Badge>;
       },
     },
@@ -98,50 +88,38 @@ export default function TodosDataTable({ data }: { data: TodoType[] }) {
       id: 'actions',
       enableHiding: false,
       cell: ({ row }) => {
-        const rowData = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0 '>
-                <span className='sr-only'>Open menu</span>
-                <Ellipsis size={20} className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='start'>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              {/* TODO edit  and change status is not working currently 
-                  @Link https://github.com/radix-ui/primitives/issues/1836
-              */}
-              <DropdownMenuItem disabled onClick={onChangeStatus}>
-                Change Status
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onViewTodo(rowData)}>View Todo</DropdownMenuItem>
-              <DropdownMenuItem disabled onClick={() => onEditTodo(rowData)}>
-                Edit Todo
-              </DropdownMenuItem>
-              <DropdownMenuItem className='text-red-500' onClick={() => onDeleteTodo(rowData)}>
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <TodoActionMenu
+            rowData={row.original}
+            updateTodoStatus={updateTodoStatus}
+            onViewTodo={onViewTodo}
+            onDeleteTodo={onDeleteTodo}
+          />
         );
       },
     },
   ];
 
-  const onChangeStatus = () => {
-    console.log('called change status');
-  };
-
   const onViewTodo = (rowData: TodoType) => {
     router.replace(`todos/${rowData.id}`);
   };
 
-  const onEditTodo = (rowData: TodoType) => {
-    setRowData(rowData);
-    setEditTodo(true);
-    // return <TodoDialog formType='edit' todo={rowData} />;
+  const updateTodoStatus = async (status: string, id: number) => {
+    const { error } = await updateTodoNewStatus(status, id);
+
+    if (error) {
+      toast.error(`Unable to update todo`, {
+        position: 'top-right',
+      });
+    }
+
+    toast.success('Todo updated Successfully', {
+      position: 'top-right',
+    });
+
+    router.refresh();
   };
+
   const onDeleteTodo = async (rowData: TodoType) => {
     const { error } = await deleteTodo(rowData.id);
 

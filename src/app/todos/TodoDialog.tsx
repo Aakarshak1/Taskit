@@ -1,28 +1,39 @@
 'use client';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { useRouter } from 'next/navigation';
+
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
 import { Database } from '@/utils/schema.types';
 import { TODO_STATUSES, LISTS, formSchema } from '@/utils/constant';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createTodo, updateTodo } from '@/lib/db';
-import { toast } from 'sonner';
 
 type Todos = Database['public']['Tables']['todos']['Row'];
 
 type TodoDialogProps = {
   formType: 'edit' | 'create';
   todo?: Todos;
+  triggerChildren?: string;
+  onOpenChange?: (value: boolean) => void;
 };
 
-export default function TodoFormDialog({ formType, todo }: TodoDialogProps) {
+export default function TodoFormDialog({
+  formType,
+  todo,
+  triggerChildren,
+  onOpenChange,
+  ...itemProps
+}: TodoDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -68,13 +79,25 @@ export default function TodoFormDialog({ formType, todo }: TodoDialogProps) {
       onOpenChange={(_open) => {
         setOpen(_open);
         form.reset();
+        if (onOpenChange) onOpenChange(_open);
       }}
     >
       <DialogTrigger asChild>
-        <Button variant='outline' size='sm'>
-          {formType === 'edit' && 'Edit todo'}
-          {formType === 'create' && 'Create todo'}
-        </Button>
+        {!triggerChildren ? (
+          <Button variant='outline' size='sm'>
+            {formType === 'edit' && 'Edit todo'}
+            {formType === 'create' && 'Create todo'}
+          </Button>
+        ) : (
+          <DropdownMenuItem
+            {...itemProps}
+            onSelect={(event) => {
+              event.preventDefault();
+            }}
+          >
+            {triggerChildren}
+          </DropdownMenuItem>
+        )}
       </DialogTrigger>
       <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
