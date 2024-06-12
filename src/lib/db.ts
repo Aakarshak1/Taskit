@@ -62,3 +62,14 @@ export async function getDataByID(id: number) {
   }
   return data;
 }
+
+export async function updateTodoNewStatus(newStatus: string, id: number) {
+  console.log({ newStatus, id });
+  const supabase = createClient();
+  const res = await supabase
+    .from('todos')
+    .update({ status: `${newStatus}` })
+    .eq('id', `${id}`);
+
+  return res;
+}
