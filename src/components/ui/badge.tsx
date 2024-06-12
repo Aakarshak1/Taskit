@@ -17,7 +17,7 @@ const badgeVariants = cva(
         work: 'border-transparent mx-1 bg-green-700 text-white hover:bg-green-700/80 cursor-pointer',
         // status
         todo: 'border-transparent mx-1 bg-zinc-500 text-white hover:bg-zinc-500/80 cursor-pointer',
-        inprogress: 'border-transparent mx-1 bg-yellow-500 text-white hover:bg-yellow-500/80 cursor-pointer',
+        inprogress: 'border-transparent mx-1 bg-yellow-400 text-gray-800 hover:bg-yellow-500/80 cursor-pointer',
         done: 'border-transparent mx-1 bg-red-700 text-white hover:bg-red-700/80 cursor-pointer',
       },
     },
