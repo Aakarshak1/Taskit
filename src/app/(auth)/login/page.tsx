@@ -82,7 +82,7 @@ const LoginForm = () => {
                 </Button>
               </CardFooter>
             </form>
-            <p className='text-center text-md text-gray-600 mt-1'>
+            <p className='text-center text-md mt-1'>
               Don&apos;t have an account?
               <Link className='text-blue-500 hover:underline ml-1' href='/signup'>
                 Sign up
